@@ -1,7 +1,7 @@
 name: spatial_memory
 description: A spatial memory mini-game. Memorize where objects are, then put them back.
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.6.0
