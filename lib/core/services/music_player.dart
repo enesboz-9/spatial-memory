@@ -55,13 +55,14 @@ class MusicPlayer {
     unawaited(_sync());
   }
 
-  /// Follows the volume slider. Applies at once to what is playing.
+  /// Follows the volume slider. Applies at once to what is playing, and
+  /// (re)starts the music when it should be audible but is not playing yet
+  /// (e.g. the browser blocked autoplay until the first tap).
   set userVolume(double value) {
     final clamped = value.clamp(0.0, 1.0).toDouble();
     if (_userVolume == clamped) return;
     _userVolume = clamped;
-    final player = _player;
-    if (player == null || player.state != PlayerState.playing) return;
+    if (_player == null && _wanted == null) return;
     // A running fade would overwrite the new level; restart the sync with a
     // very short fade so the slider feels immediate.
     unawaited(_sync(fadeIn: _fadeStep));
@@ -97,7 +98,7 @@ class MusicPlayer {
     try {
       final player = _player ??= _createPlayer();
       if (!shouldPlay) {
-        if (player.state == PlayerState.playing) {
+        if (player.state == PlayerState.playing || _loaded != null) {
           await _fadeTo(player, 0, _fadeOut, token);
           if (token == _token) await player.pause();
         }
@@ -111,7 +112,11 @@ class MusicPlayer {
         _level = 0;
         await player.play(AssetSource(wanted), volume: 0);
         _loaded = wanted;
-        if (token != _token) return;
+        if (token != _token) {
+          // Switched off / backgrounded while the track was starting.
+          if (!(_enabled && !_inBackground)) await player.pause();
+          return;
+        }
       } else if (player.state != PlayerState.playing) {
         await player.setVolume(0);
         _level = 0;

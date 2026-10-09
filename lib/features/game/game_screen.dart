@@ -13,6 +13,7 @@ import '../../core/services/progress_store.dart';
 import '../../core/utils/format.dart';
 import '../../core/utils/hint_builder.dart';
 import '../../data/game_configs/game_configs.dart';
+import '../common/sound_button.dart';
 import '../result/result_screen.dart';
 import 'game_controller.dart';
 import 'widgets/environment_background.dart';
@@ -152,7 +153,9 @@ class PlayScaffold extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: Stack(
+          children: [
+            Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
@@ -215,6 +218,11 @@ class PlayScaffold extends StatelessWidget {
               ),
             ],
           ),
+        ),
+            // Volume / mute is reachable during a round too, not only on
+            // the home screen.
+            const Positioned(top: 0, right: 0, child: SoundButton()),
+          ],
         ),
       ),
     );

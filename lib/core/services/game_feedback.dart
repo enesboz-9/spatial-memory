@@ -13,8 +13,13 @@ class GameFeedback {
   const GameFeedback({required this.enabled});
 
   /// Follows the sound / vibration switch on the home screen.
-  factory GameFeedback.of(BuildContext context) =>
-      GameFeedback(enabled: ProgressScope.read(context).feedbackEnabled);
+  factory GameFeedback.of(BuildContext context) {
+    final store = ProgressScope.read(context);
+    // Volume slider at zero counts as muted too.
+    return GameFeedback(
+      enabled: store.feedbackEnabled && store.musicVolume > 0,
+    );
+  }
 
   final bool enabled;
 
