@@ -11,6 +11,7 @@ class GameConfig {
     this.fakeCount = 0,
     this.timed = true,
     this.rotatedObjects,
+    this.peekCount = 0,
   });
 
   final String id;
@@ -32,6 +33,11 @@ class GameConfig {
   /// object of the level (normal levels); survival raises it step by step.
   /// Only meaningful while [rotationEnabled] is true.
   final int? rotatedObjects;
+
+  /// How many times per round the player may peek at the original scene while
+  /// placing (it shows for a couple of seconds). Easy levels
+  /// only; 0 means no peeking.
+  final int peekCount;
 
   /// False for the tutorial: no countdowns, the player moves on by button.
   final bool timed;

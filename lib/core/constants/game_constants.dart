@@ -20,10 +20,10 @@ abstract final class GameConstants {
   // --- Scoring --------------------------------------------------------------
 
   /// Within this distance of the real position an object scores 100%.
-  static const double perfectRadius = 0.03;
+  static const double perfectRadius = 0.05;
 
   /// At this distance (or further) an object scores 0%.
-  static const double maxAccuracyDistance = 0.30;
+  static const double maxAccuracyDistance = 0.40;
 
   /// Object score when every object is placed perfectly.
   static const double maxObjectScore = 1000;
@@ -47,20 +47,20 @@ abstract final class GameConstants {
 
   /// Every difficulty level uses the same timers. The memorize phase can be
   /// skipped early from the game screen.
-  static const int defaultMemorizeSeconds = 30;
-  static const int defaultPlacementSeconds = 60;
+  static const int defaultMemorizeSeconds = 40;
+  static const int defaultPlacementSeconds = 90;
 
   // --- Fake objects -----------------------------------------------------------
 
   /// Points lost (before the difficulty multiplier) for every fake object the
   /// player puts in the scene. Fakes never appeared during memorizing.
-  static const double fakePenaltyPerObject = 100;
+  static const double fakePenaltyPerObject = 50;
 
   // --- Environment mechanics ------------------------------------------------
 
   /// Direction: how much a completely wrong heading costs an object. 0.4 means
-  /// a fully opposite heading keeps only 60% of the position accuracy.
-  static const double directionPenaltyWeight = 0.4;
+  /// a fully opposite heading keeps 75% of the position accuracy.
+  static const double directionPenaltyWeight = 0.25;
 
   /// Direction: a level always contains at least this many directional objects
   /// (if the environment has that many).
@@ -82,22 +82,22 @@ abstract final class GameConstants {
 
   /// Average accuracy needed for 1, 2 and 3 stars. Below the first value a
   /// round earns no star.
-  static const double oneStarAccuracy = 0.50;
-  static const double twoStarAccuracy = 0.65;
-  static const double threeStarAccuracy = 0.80;
+  static const double oneStarAccuracy = 0.40;
+  static const double twoStarAccuracy = 0.55;
+  static const double threeStarAccuracy = 0.70;
 
   /// At this average accuracy the round is PERFECT and a gift 4th star is
   /// added on top of the three.
-  static const double perfectRoundAccuracy = 0.90;
+  static const double perfectRoundAccuracy = 0.85;
   static const int maxStars = 4;
 
   /// A difficulty level opens when the previous level of the same environment
   /// was finished with at least this many stars.
-  static const int starsToUnlockLevel = 2;
+  static const int starsToUnlockLevel = 1;
 
   /// Total stars (over every environment and level) needed to open the n-th
   /// environment in [Environments.all]. The first one is always open.
-  static const List<int> environmentUnlockStars = [0, 4, 10, 18, 28];
+  static const List<int> environmentUnlockStars = [0, 3, 9, 16, 25];
 
   /// Debug switch: opens every level and environment.
   static const bool unlockEverything = false;
@@ -115,11 +115,20 @@ abstract final class GameConstants {
   static const int survivalMaxObjects = 15;
 
   /// The run ends when a round's average accuracy drops below this.
-  static const double survivalMinAccuracy = 0.40;
+  static const double survivalMinAccuracy = 0.30;
 
   /// Score multiplier grows by this much per round (capped).
   static const double survivalMultiplierStep = 0.1;
   static const double survivalMaxMultiplier = 3.0;
+
+  // --- Help for the player ----------------------------------------------------
+
+  /// The play area is split into this many equal columns and rows by faint
+  /// guide lines (memorizing and placing), so positions are easier to compare.
+  static const int guideGridDivisions = 3;
+
+  /// How long the "peek" help shows the original scene again while placing.
+  static const int peekSeconds = 2;
 
   // --- Feedback ---------------------------------------------------------------
 

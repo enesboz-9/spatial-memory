@@ -3,7 +3,8 @@ import 'dart:math' show min;
 import '../../core/constants/game_constants.dart';
 import '../../core/models/game_config.dart';
 
-/// Normal levels add 2 objects per step (5, 7, 9, 11, 13). Headings start at
+/// Normal levels add 2 objects per step (4, 6, 8, 10, 12). Easy and Medium
+/// allow a few "peeks" at the original scene while placing. Headings start at
 /// Hard, fake objects at Hard as well.
 ///
 /// Every environment pool must hold at least [GameConfigs.requiredPoolSize]
@@ -18,27 +19,29 @@ abstract final class GameConfigs {
   static const GameConfig easy = GameConfig(
     id: 'easy',
     name: 'Easy',
-    objectCount: 5,
+    objectCount: 4,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 1.0,
     rotationEnabled: false,
+    peekCount: 2,
   );
 
   static const GameConfig medium = GameConfig(
     id: 'medium',
     name: 'Medium',
-    objectCount: 7,
+    objectCount: 6,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 1.5,
     rotationEnabled: false,
+    peekCount: 1,
   );
 
   static const GameConfig hard = GameConfig(
     id: 'hard',
     name: 'Hard',
-    objectCount: 9,
+    objectCount: 8,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 2.0,
@@ -49,7 +52,7 @@ abstract final class GameConfigs {
   static const GameConfig expert = GameConfig(
     id: 'expert',
     name: 'Expert',
-    objectCount: 11,
+    objectCount: 10,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 2.5,
@@ -60,7 +63,7 @@ abstract final class GameConfigs {
   static const GameConfig extreme = GameConfig(
     id: 'extreme',
     name: 'Extreme',
-    objectCount: 13,
+    objectCount: 12,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 3.0,
@@ -155,6 +158,6 @@ abstract final class GameConfigs {
   static const List<GameConfig> all = [easy, medium, hard, expert, extreme];
 
   /// Objects an environment pool needs: survival tops out at 15 real objects
-  /// + 3 fakes (the biggest normal level, Extreme, is 13 + 3).
+  /// + 3 fakes (the biggest normal level, Extreme, is 12 + 3).
   static const int requiredPoolSize = 18;
 }

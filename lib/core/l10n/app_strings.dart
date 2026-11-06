@@ -222,6 +222,7 @@ class AppStrings {
   String get placeObjects => _t('Place the objects', 'Nesneleri yerleştir');
   String get skipMemorize =>
       _t("I'm ready, start placing", 'Hazırım, yerleştirmeye geç');
+  String peekButton(int left) => _t('Peek ($left)', 'Göz at ($left)');
   String get defaultHint => _t(
         'Study the positions. The objects will disappear.',
         'Konumları incele. Nesneler kaybolacak.',

@@ -36,14 +36,14 @@ void main() {
   musicTests();
   group('stars', () {
     test('thresholds', () {
-      expect(ScoreCalculator.starsFor(0.49), 0);
-      expect(ScoreCalculator.starsFor(0.50), 1);
-      expect(ScoreCalculator.starsFor(0.64), 1);
-      expect(ScoreCalculator.starsFor(0.65), 2);
-      expect(ScoreCalculator.starsFor(0.79), 2);
-      expect(ScoreCalculator.starsFor(0.80), 3);
-      expect(ScoreCalculator.starsFor(0.89), 3);
-      expect(ScoreCalculator.starsFor(0.90), 4); // PERFECT + gift star
+      expect(ScoreCalculator.starsFor(0.39), 0);
+      expect(ScoreCalculator.starsFor(0.40), 1);
+      expect(ScoreCalculator.starsFor(0.54), 1);
+      expect(ScoreCalculator.starsFor(0.55), 2);
+      expect(ScoreCalculator.starsFor(0.69), 2);
+      expect(ScoreCalculator.starsFor(0.70), 3);
+      expect(ScoreCalculator.starsFor(0.84), 3);
+      expect(ScoreCalculator.starsFor(0.85), 4); // PERFECT + gift star
       expect(ScoreCalculator.starsFor(1), 4);
     });
 
@@ -100,7 +100,7 @@ void main() {
       expect(store.isEnvironmentUnlocked(envs[0], envs, all), isTrue);
       expect(store.isEnvironmentUnlocked(envs[1], envs, all), isFalse);
 
-      // 4 stars per perfect level: easy + medium = 8 (>= 4, < 10).
+      // 4 stars per perfect level: easy + medium = 8 (>= 3, < 9).
       for (final config in [GameConfigs.easy, GameConfigs.medium]) {
         store.recordRound(envs[0], config, _score(perfect: true));
       }

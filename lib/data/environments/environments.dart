@@ -12,7 +12,7 @@ abstract final class Environments {
     backgroundColor: Color(0xFF0B1230),
     background: BackgroundStyle.stars,
     mechanic: EnvironmentMechanic.direction,
-    directionSteps: 8,
+    directionSteps: 4,
     ruleHint: 'Antennas and dishes have a direction. Remember where they point.',
     placeHint: 'Tap a placed object with an arrow to turn it.',
     objectPool: [

@@ -17,6 +17,7 @@ import '../common/sound_button.dart';
 import '../result/result_screen.dart';
 import 'game_controller.dart';
 import 'widgets/environment_background.dart';
+import 'widgets/guide_grid.dart';
 import 'widgets/object_badge.dart';
 import 'widgets/relation_overlay.dart';
 
@@ -353,6 +354,7 @@ class _PlayAreaState extends State<_PlayArea> {
             Positioned.fill(
               child: EnvironmentBackground(environment: controller.environment),
             ),
+            const Positioned.fill(child: GuideGrid()),
             for (final object in controller.objects)
               if (!isPlacing)
                 Positioned(
@@ -390,11 +392,28 @@ class _PlayAreaState extends State<_PlayArea> {
                           : null,
                     ),
                   ),
-            // Island lines and camp rings are shown while memorizing only.
-            if (!isPlacing)
+            // Island lines and camp rings are shown while memorizing only
+            // (and while peeking).
+            if (!isPlacing || controller.isPeeking)
               Positioned.fill(
                 child: RelationOverlay(objects: controller.objects),
               ),
+            // Peek: the original scene, laid over the player's placements.
+            if (isPlacing && controller.isPeeking)
+              for (final object in controller.objects)
+                Positioned(
+                  left: object.targetX * side - half,
+                  top: object.targetY * side - half,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.85,
+                      child: ObjectBadge(
+                        definition: object.definition,
+                        angle: object.isDirectional ? object.targetAngle : null,
+                      ),
+                    ),
+                  ),
+                ),
           ],
         ),
       ),
@@ -454,12 +473,34 @@ class _PlacementTray extends StatelessWidget {
                 ),
         ),
         const SizedBox(height: 12),
-        FilledButton(
-          onPressed: controller.finish,
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          child: Text(
-            strings.finish(controller.placedCount, controller.objects.length),
-          ),
+        Row(
+          children: [
+            if (controller.config.peekCount > 0) ...[
+              OutlinedButton.icon(
+                onPressed: controller.canPeek ? controller.peek : null,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 52),
+                ),
+                icon: const Icon(Icons.visibility),
+                label: Text(strings.peekButton(controller.peeksLeft)),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: FilledButton(
+                onPressed: controller.finish,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                ),
+                child: Text(
+                  strings.finish(
+                    controller.placedCount,
+                    controller.objects.length,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

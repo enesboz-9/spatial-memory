@@ -52,6 +52,9 @@ class GameController extends ChangeNotifier {
   int _secondsLeft = 0;
   Timer? _timer;
   ScoreResult? _score;
+  Timer? _peekTimer;
+  int _peeksLeft = 0;
+  bool _peeking = false;
 
   List<GameObject> get objects => _objects;
   List<FakeObject> get fakes => _fakes;
@@ -60,6 +63,12 @@ class GameController extends ChangeNotifier {
   ScoreResult? get score => _score;
   int get placedCount => _objects.where((o) => o.isPlaced).length;
   int get placedFakeCount => _fakes.where((f) => f.isPlaced).length;
+
+  /// Peeks still available this round, and whether the original scene is
+  /// showing right now.
+  int get peeksLeft => _peeksLeft;
+  bool get isPeeking => _peeking;
+  bool get canPeek => _phase == GamePhase.place && !_peeking && _peeksLeft > 0;
 
   /// Everything that is still in the tray (real objects and fakes).
   List<TrayEntry> get unplacedTray {
@@ -111,6 +120,7 @@ class GameController extends ChangeNotifier {
       for (final fake in _fakes) fake.id,
     ]..shuffle(Random(seed + 1));
     _score = null;
+    _peeksLeft = config.peekCount;
     _phase = GamePhase.memorize;
     if (config.timed) {
       _runCountdown(config.memorizeSeconds, _beginPlacement);
@@ -124,6 +134,20 @@ class GameController extends ChangeNotifier {
   void skipMemorize() {
     if (_phase != GamePhase.memorize) return;
     _beginPlacement();
+  }
+
+  /// Shows the original scene again for [GameConstants.peekSeconds] seconds
+  /// (uses up one peek). The placement countdown keeps running.
+  void peek() {
+    if (!canPeek) return;
+    _peeksLeft--;
+    _peeking = true;
+    _peekTimer = Timer(const Duration(seconds: GameConstants.peekSeconds), () {
+      _peeking = false;
+      _peekTimer = null;
+      notifyListeners();
+    });
+    notifyListeners();
   }
 
   /// Stores where the player dropped an object (normalized, clamped to 0..1).
@@ -216,6 +240,9 @@ class GameController extends ChangeNotifier {
   void _cancelTimer() {
     _timer?.cancel();
     _timer = null;
+    _peekTimer?.cancel();
+    _peekTimer = null;
+    _peeking = false;
   }
 
   @override

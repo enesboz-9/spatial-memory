@@ -193,15 +193,15 @@ void main() {
 
     test('98% accuracy and above is PERFECT', () {
       expect(evaluate(objectAt(0)).isPerfect, isTrue);
-      // 0.034 away: accuracy is about 98.5%.
-      final close = evaluate(objectAt(0.034));
+      // 0.055 away: accuracy is about 98.6%.
+      final close = evaluate(objectAt(0.055));
       expect(close.accuracy, greaterThanOrEqualTo(0.98));
       expect(close.isPerfect, isTrue);
     });
 
     test('just below 98% is not PERFECT', () {
-      // 0.04 away: accuracy is about 96%.
-      final result = evaluate(objectAt(0.04));
+      // 0.06 away: accuracy is about 97%.
+      final result = evaluate(objectAt(0.06));
       expect(result.accuracy, lessThan(0.98));
       expect(result.isPerfect, isFalse);
     });
@@ -277,7 +277,10 @@ void main() {
       final result = evaluate(antenna(target: 2, placed: 3));
       expect(result.directionAccuracy, closeTo(0.75, 1e-9));
       expect(result.angleErrorDegrees, 45);
-      expect(result.accuracy, closeTo(0.9, 1e-9));
+      expect(
+        result.accuracy,
+        closeTo(1 - GameConstants.directionPenaltyWeight * 0.25, 1e-9),
+      );
       expect(result.isPerfect, isFalse);
     });
 
@@ -393,7 +396,7 @@ void main() {
     test('normal levels add 2 objects per step', () {
       expect(
         GameConfigs.all.map((c) => c.objectCount).toList(),
-        [5, 7, 9, 11, 13],
+        [4, 6, 8, 10, 12],
       );
     });
 
@@ -413,10 +416,10 @@ void main() {
       expect(configs.map((c) => c.id).toSet().length, configs.length);
     });
 
-    test('every level has 30 s to memorize and 60 s to place', () {
+    test('every level has 40 s to memorize and 90 s to place', () {
       for (final config in GameConfigs.all) {
-        expect(config.memorizeSeconds, 30, reason: config.id);
-        expect(config.placementSeconds, 60, reason: config.id);
+        expect(config.memorizeSeconds, 40, reason: config.id);
+        expect(config.placementSeconds, 90, reason: config.id);
       }
     });
 
@@ -887,16 +890,53 @@ void main() {
       addTearDown(controller.dispose);
 
       expect(controller.phase, GamePhase.memorize);
-      expect(controller.secondsLeft, 30);
+      expect(controller.secondsLeft, 40);
       controller.skipMemorize();
       expect(controller.phase, GamePhase.place);
-      expect(controller.secondsLeft, 60);
+      expect(controller.secondsLeft, 90);
       expect(controller.fakes, isEmpty);
 
       // Skipping again (or later) does nothing.
       controller.skipMemorize();
       expect(controller.phase, GamePhase.place);
-      expect(controller.secondsLeft, 60);
+      expect(controller.secondsLeft, 90);
+    });
+
+    test('peek: limited uses, only while placing, shows the scene briefly', () {
+      final controller = GameController(
+        environment: Environments.island,
+        config: GameConfigs.easy,
+        seed: 1,
+      )..start();
+      addTearDown(controller.dispose);
+
+      expect(controller.peeksLeft, GameConfigs.easy.peekCount);
+      controller.peek(); // still memorizing
+      expect(controller.peeksLeft, GameConfigs.easy.peekCount);
+      expect(controller.isPeeking, isFalse);
+
+      controller.skipMemorize();
+      controller.peek();
+      expect(controller.isPeeking, isTrue);
+      expect(controller.peeksLeft, GameConfigs.easy.peekCount - 1);
+      controller.peek(); // already peeking
+      expect(controller.peeksLeft, GameConfigs.easy.peekCount - 1);
+
+      controller.finish();
+      expect(controller.isPeeking, isFalse);
+    });
+
+    test('levels from Hard on have no peeks', () {
+      expect(GameConfigs.hard.peekCount, 0);
+      expect(GameConfigs.medium.peekCount, lessThan(GameConfigs.easy.peekCount));
+      final controller = GameController(
+        environment: Environments.island,
+        config: GameConfigs.hard,
+        seed: 1,
+      )..start();
+      addTearDown(controller.dispose);
+      controller.skipMemorize();
+      expect(controller.canPeek, isFalse);
     });
 
     test('objects cannot be placed while memorizing', () {
@@ -1007,7 +1047,7 @@ void main() {
       expect(en.levelInfo(GameConfigs.medium), isNot(contains('fake')));
       expect(en.levelInfo(GameConfigs.hard), contains('1 fake'));
       expect(tr.levelInfo(GameConfigs.expert), contains('2 sahte'));
-      expect(tr.levelInfo(GameConfigs.easy), contains('30 sn ezberleme'));
+      expect(tr.levelInfo(GameConfigs.easy), contains('40 sn ezberleme'));
     });
 
     test('offsetSide agrees with the English phrase', () {
