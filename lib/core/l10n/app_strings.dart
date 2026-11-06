@@ -55,6 +55,8 @@ class AppStrings {
       'hard' => 'Zor',
       'expert' => 'Uzman',
       'extreme' => 'Ekstrem',
+      'expert_plus' => 'Uzman+',
+      'expert_plus_plus' => 'Uzman++',
       _ => config.name,
     };
   }

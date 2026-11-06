@@ -408,7 +408,7 @@ void main() {
     test('normal levels grow slowly from 2 objects', () {
       expect(
         GameConfigs.all.map((c) => c.objectCount).toList(),
-        [2, 3, 4, 6, 8],
+        [2, 3, 4, 6, 8, 10, 12],
       );
     });
 
@@ -441,6 +441,8 @@ void main() {
       expect(GameConfigs.hard.fakeCount, 1);
       expect(GameConfigs.expert.fakeCount, 2);
       expect(GameConfigs.extreme.fakeCount, 3);
+      expect(GameConfigs.expertPlus.fakeCount, 3);
+      expect(GameConfigs.expertPlusPlus.fakeCount, 4);
     });
 
     test('every environment pool fits the biggest level', () {
@@ -992,6 +994,8 @@ void main() {
       expect(tr.environmentName(Environments.camp), 'Kamp');
       expect(tr.difficultyName(GameConfigs.medium), 'Orta');
       expect(tr.difficultyName(GameConfigs.extreme), 'Ekstrem');
+      expect(tr.difficultyName(GameConfigs.expertPlus), 'Uzman+');
+      expect(tr.difficultyName(GameConfigs.expertPlusPlus), 'Uzman++');
       expect(tr.language.code, 'tr');
     });
 

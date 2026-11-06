@@ -260,6 +260,12 @@ void main() {
       expect(config.rotatedObjects, 0);
     });
 
+    test('every survival round allows one peek', () {
+      for (var r = 1; r <= 40; r++) {
+        expect(GameConfigs.survivalRound(r).peekCount, 1, reason: 'r$r');
+      }
+    });
+
     test('multiplier grows and is capped', () {
       expect(GameConfigs.survivalRound(1).scoreMultiplier, 1.0);
       expect(

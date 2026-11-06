@@ -3,7 +3,7 @@ import 'dart:math' show min;
 import '../../core/constants/game_constants.dart';
 import '../../core/models/game_config.dart';
 
-/// Normal levels grow slowly: 2, 3, 4, 6, 8 objects. Every normal level
+/// Normal levels grow slowly: 2, 3, 4, 6, 8, 10, 12 objects. Every normal level
 /// allows one "peek" at the original scene while placing. Headings start at
 /// Hard, fake objects at Hard as well.
 ///
@@ -71,6 +71,30 @@ abstract final class GameConfigs {
     scoreMultiplier: 3.0,
     rotationEnabled: true,
     fakeCount: 3,
+    peekCount: 1,
+  );
+
+  static const GameConfig expertPlus = GameConfig(
+    id: 'expert_plus',
+    name: 'Expert+',
+    objectCount: 10,
+    memorizeSeconds: GameConstants.defaultMemorizeSeconds,
+    placementSeconds: GameConstants.defaultPlacementSeconds,
+    scoreMultiplier: 3.5,
+    rotationEnabled: true,
+    fakeCount: 3,
+    peekCount: 1,
+  );
+
+  static const GameConfig expertPlusPlus = GameConfig(
+    id: 'expert_plus_plus',
+    name: 'Expert++',
+    objectCount: 12,
+    memorizeSeconds: GameConstants.defaultMemorizeSeconds,
+    placementSeconds: GameConstants.defaultPlacementSeconds,
+    scoreMultiplier: 4.0,
+    rotationEnabled: true,
+    fakeCount: 4,
     peekCount: 1,
   );
 
@@ -149,6 +173,7 @@ abstract final class GameConfigs {
         GameConstants.survivalMaxMultiplier,
       ),
       rotationEnabled: stage.rotated > 0,
+      peekCount: 1,
       rotatedObjects: stage.rotated,
       fakeCount: GameConstants.survivalFakeObjects
           .where((from) => objects >= from)
@@ -156,9 +181,17 @@ abstract final class GameConfigs {
     );
   }
 
-  static const List<GameConfig> all = [easy, medium, hard, expert, extreme];
+  static const List<GameConfig> all = [
+    easy,
+    medium,
+    hard,
+    expert,
+    extreme,
+    expertPlus,
+    expertPlusPlus,
+  ];
 
   /// Objects an environment pool needs: survival tops out at 15 real objects
-  /// + 3 fakes (the biggest normal level, Extreme, is 8 + 3).
+  /// + 3 fakes (the biggest normal level, Expert++, is 12 + 4).
   static const int requiredPoolSize = 18;
 }
