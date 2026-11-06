@@ -105,14 +105,22 @@ abstract final class GameConstants {
   // --- Survival mode ----------------------------------------------------------
 
   /// Survival ramp:
-  ///  1. Rounds with 1, 2 ... [survivalRampObjects] objects, no rotation.
+  ///  1. Stages with 2, 3 ... [survivalRampObjects] objects, no rotation.
   ///  2. [survivalRampObjects] objects with 1, 2 ... [survivalRampObjects]
   ///     rotated objects.
   ///  3. From then on every round either adds one object or rotates one more
   ///     object, alternating (see GameConfigs.survivalRound).
-  static const int survivalStartObjects = 1;
+  static const int survivalStartObjects = 2;
   static const int survivalRampObjects = 5;
   static const int survivalMaxObjects = 15;
+
+  /// Every survival stage (see above) lasts this many rounds before the next
+  /// one starts, so the run gets harder slowly.
+  static const int survivalRoundsPerStage = 2;
+
+  /// Survival: fake objects appear from these object counts on (1, 2 and 3
+  /// fakes). Fixed values, independent of the normal levels' object counts.
+  static const List<int> survivalFakeObjects = [9, 11, 13];
 
   /// The run ends when a round's average accuracy drops below this.
   static const double survivalMinAccuracy = 0.30;

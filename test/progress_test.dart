@@ -180,21 +180,38 @@ void main() {
   });
 
   group('survival rounds', () {
-    List<(int, int)> stages(int rounds, int rotatable) => [
-          for (var r = 1; r <= rounds; r++)
+    // One entry per stage (a stage lasts survivalRoundsPerStage rounds).
+    int firstRound(int stage) => stage * GameConstants.survivalRoundsPerStage + 1;
+    List<(int, int)> stages(int count, int rotatable) => [
+          for (var s = 0; s < count; s++)
             (
-              GameConfigs.survivalStage(r, rotatable: rotatable).objects,
-              GameConfigs.survivalStage(r, rotatable: rotatable).rotated,
+              GameConfigs.survivalStage(firstRound(s), rotatable: rotatable)
+                  .objects,
+              GameConfigs.survivalStage(firstRound(s), rotatable: rotatable)
+                  .rotated,
             ),
         ];
 
-    test('starts with one object and grows to five without rotation', () {
-      expect(GameConstants.survivalStartObjects, 1);
+    test('every stage lasts the same number of rounds', () {
+      const per = GameConstants.survivalRoundsPerStage;
+      for (var s = 0; s < 6; s++) {
+        final first = GameConfigs.survivalStage(firstRound(s), rotatable: 8);
+        for (var r = 0; r < per; r++) {
+          expect(
+            GameConfigs.survivalStage(firstRound(s) + r, rotatable: 8),
+            first,
+          );
+        }
+      }
+    });
+
+    test('starts with two objects and grows to five without rotation', () {
+      expect(GameConstants.survivalStartObjects, 2);
       expect(
-        stages(5, 8),
-        [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0)],
+        stages(4, 8),
+        [(2, 0), (3, 0), (4, 0), (5, 0)],
       );
-      for (var r = 1; r <= 5; r++) {
+      for (var r = 1; r <= 4 * GameConstants.survivalRoundsPerStage; r++) {
         expect(GameConfigs.survivalRound(r, rotatable: 8).rotationEnabled,
             isFalse);
       }
@@ -202,17 +219,17 @@ void main() {
 
     test('then five objects with one to five rotating', () {
       expect(
-        stages(10, 8).skip(5).toList(),
+        stages(9, 8).skip(4).toList(),
         [(5, 1), (5, 2), (5, 3), (5, 4), (5, 5)],
       );
-      final config = GameConfigs.survivalRound(8, rotatable: 8);
+      final config = GameConfigs.survivalRound(firstRound(6), rotatable: 8);
       expect(config.rotationEnabled, isTrue);
       expect(config.rotatedObjects, 3);
     });
 
     test('afterwards every round adds an object or rotates one more', () {
       final all = stages(30, 8);
-      for (var i = 10; i < all.length; i++) {
+      for (var i = 9; i < all.length; i++) {
         final before = all[i - 1];
         final now = all[i];
         final addedObject = now.$1 == before.$1 + 1 && now.$2 == before.$2;
@@ -233,7 +250,7 @@ void main() {
       // No headings at all: rotation steps are skipped.
       final plain = stages(20, 0);
       expect(plain.map((s) => s.$2).reduce(max), 0);
-      expect(plain[5], (6, 0));
+      expect(plain[4], (6, 0));
       expect(plain.last, (GameConstants.survivalMaxObjects, 0));
     });
 

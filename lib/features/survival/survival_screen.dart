@@ -13,7 +13,7 @@ import '../game/game_screen.dart';
 import '../result/result_screen.dart';
 import 'score_board.dart';
 
-/// Endless mode. It starts with 1 object and grows to 5, then 1 to 5 of those
+/// Endless mode. It starts with 2 objects and grows to 5, then 1 to 5 of those
 /// objects start turning, and after that every round adds an object or turns
 /// one more (see [GameConfigs.survivalRound]). The run ends when a round's
 /// average accuracy falls below [GameConstants.survivalMinAccuracy].

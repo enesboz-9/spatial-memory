@@ -3,8 +3,8 @@ import 'dart:math' show min;
 import '../../core/constants/game_constants.dart';
 import '../../core/models/game_config.dart';
 
-/// Normal levels add 2 objects per step (4, 6, 8, 10, 12). Easy and Medium
-/// allow a few "peeks" at the original scene while placing. Headings start at
+/// Normal levels grow slowly: 2, 3, 4, 6, 8 objects. Every normal level
+/// allows one "peek" at the original scene while placing. Headings start at
 /// Hard, fake objects at Hard as well.
 ///
 /// Every environment pool must hold at least [GameConfigs.requiredPoolSize]
@@ -19,18 +19,18 @@ abstract final class GameConfigs {
   static const GameConfig easy = GameConfig(
     id: 'easy',
     name: 'Easy',
-    objectCount: 4,
+    objectCount: 2,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 1.0,
     rotationEnabled: false,
-    peekCount: 2,
+    peekCount: 1,
   );
 
   static const GameConfig medium = GameConfig(
     id: 'medium',
     name: 'Medium',
-    objectCount: 6,
+    objectCount: 3,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 1.5,
@@ -41,34 +41,37 @@ abstract final class GameConfigs {
   static const GameConfig hard = GameConfig(
     id: 'hard',
     name: 'Hard',
-    objectCount: 8,
+    objectCount: 4,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 2.0,
     rotationEnabled: true,
     fakeCount: 1,
+    peekCount: 1,
   );
 
   static const GameConfig expert = GameConfig(
     id: 'expert',
     name: 'Expert',
-    objectCount: 10,
+    objectCount: 6,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 2.5,
     rotationEnabled: true,
     fakeCount: 2,
+    peekCount: 1,
   );
 
   static const GameConfig extreme = GameConfig(
     id: 'extreme',
     name: 'Extreme',
-    objectCount: 12,
+    objectCount: 8,
     memorizeSeconds: GameConstants.defaultMemorizeSeconds,
     placementSeconds: GameConstants.defaultPlacementSeconds,
     scoreMultiplier: 3.0,
     rotationEnabled: true,
     fakeCount: 3,
+    peekCount: 1,
   );
 
   /// Tiny, untimed round used by the first-launch tutorial.
@@ -84,14 +87,15 @@ abstract final class GameConfigs {
     timed: false,
   );
 
-  /// Objects and rotated objects of survival round [round] (1-based).
+  /// Objects and rotated objects of survival round [round] (1-based). Every
+  /// stage below lasts [GameConstants.survivalRoundsPerStage] rounds.
   ///
   /// [rotatable] is how many objects of the environment can turn (see
   /// `Environment.rotatableCount`); 0 means the environment has no headings,
   /// so rotation steps are skipped and every round just adds an object.
   ///
-  /// 1. Rounds 1-5: 1, 2, 3, 4, 5 objects, nothing turns.
-  /// 2. Next 5 rounds: 5 objects with 1, 2, 3, 4, 5 of them turning.
+  /// 1. First stages: 2, 3, 4, 5 objects, nothing turns.
+  /// 2. Next 5 stages: 5 objects with 1, 2, 3, 4, 5 of them turning.
   /// 3. After that every round either adds an object or makes one more object
   ///    turn, alternating (object first). When one of the two is not possible
   ///    any more (object limit, or every object already turns) the other one
@@ -109,7 +113,8 @@ abstract final class GameConfigs {
     bool canAddObject() => objects < maxObjects;
     bool canRotate() => rotated < min(objects, rotatable);
 
-    for (var step = 1; step < round; step++) {
+    final stage = (round - 1) ~/ GameConstants.survivalRoundsPerStage;
+    for (var step = 0; step < stage; step++) {
       if (objects < ramp) {
         objects++;
       } else if (rotated < min(ramp, rotatable)) {
@@ -129,7 +134,7 @@ abstract final class GameConfigs {
   }
 
   /// Survival round [round] (1-based). See [survivalStage] for the ramp.
-  /// Fakes switch on at the same object counts as the normal levels.
+  /// Fakes switch on at [GameConstants.survivalFakeObjects].
   static GameConfig survivalRound(int round, {int rotatable = 0}) {
     final stage = survivalStage(round, rotatable: rotatable);
     final objects = stage.objects;
@@ -145,19 +150,15 @@ abstract final class GameConfigs {
       ),
       rotationEnabled: stage.rotated > 0,
       rotatedObjects: stage.rotated,
-      fakeCount: objects >= extreme.objectCount
-          ? 3
-          : objects >= expert.objectCount
-              ? 2
-              : objects >= hard.objectCount
-                  ? 1
-                  : 0,
+      fakeCount: GameConstants.survivalFakeObjects
+          .where((from) => objects >= from)
+          .length,
     );
   }
 
   static const List<GameConfig> all = [easy, medium, hard, expert, extreme];
 
   /// Objects an environment pool needs: survival tops out at 15 real objects
-  /// + 3 fakes (the biggest normal level, Extreme, is 12 + 3).
+  /// + 3 fakes (the biggest normal level, Extreme, is 8 + 3).
   static const int requiredPoolSize = 18;
 }

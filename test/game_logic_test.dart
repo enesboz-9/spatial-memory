@@ -5,6 +5,7 @@ import 'package:spatial_memory/core/constants/game_constants.dart';
 import 'package:spatial_memory/core/l10n/app_language.dart';
 import 'package:spatial_memory/core/l10n/app_strings.dart';
 import 'package:spatial_memory/core/models/environment.dart';
+import 'package:spatial_memory/core/models/game_config.dart';
 import 'package:spatial_memory/core/models/game_object.dart';
 import 'package:spatial_memory/core/models/score_result.dart';
 import 'package:spatial_memory/core/utils/format.dart';
@@ -14,6 +15,17 @@ import 'package:spatial_memory/core/utils/score_calculator.dart';
 import 'package:spatial_memory/data/environments/environments.dart';
 import 'package:spatial_memory/data/game_configs/game_configs.dart';
 import 'package:spatial_memory/features/game/game_controller.dart';
+
+/// A 9-object level (two pairs / two groups), bigger than the normal levels.
+const _bigLevel = GameConfig(
+  id: 'big',
+  name: 'Big',
+  objectCount: 9,
+  memorizeSeconds: 40,
+  placementSeconds: 90,
+  scoreMultiplier: 2,
+  rotationEnabled: true,
+);
 
 void main() {
   group('ScoreCalculator', () {
@@ -393,10 +405,10 @@ void main() {
       );
     });
 
-    test('normal levels add 2 objects per step', () {
+    test('normal levels grow slowly from 2 objects', () {
       expect(
         GameConfigs.all.map((c) => c.objectCount).toList(),
-        [4, 6, 8, 10, 12],
+        [2, 3, 4, 6, 8],
       );
     });
 
@@ -535,7 +547,7 @@ void main() {
       for (var seed = 0; seed < 100; seed++) {
         final objects = LevelGenerator.generate(
           environment: Environments.island,
-          config: GameConfigs.hard,
+          config: _bigLevel,
           seed: seed,
         );
         final children = objects.where((o) => o.anchorId != null).toList();
@@ -587,8 +599,8 @@ void main() {
       expect(bottles.map((d) => d.id).toSet().length, 3);
     });
 
-    test('every level contains all three bottles', () {
-      for (final config in GameConfigs.all) {
+    test('every level with 3+ objects contains all three bottles', () {
+      for (final config in GameConfigs.all.where((c) => c.objectCount >= 3)) {
         for (var seed = 0; seed < 100; seed++) {
           final objects = LevelGenerator.generate(
             environment: Environments.laboratory,
@@ -682,7 +694,7 @@ void main() {
       for (var seed = 0; seed < 100; seed++) {
         final objects = LevelGenerator.generate(
           environment: Environments.camp,
-          config: GameConfigs.hard,
+          config: _bigLevel,
           seed: seed,
         );
         final groups = <int, List<GameObject>>{};
@@ -706,7 +718,7 @@ void main() {
     test('memorize hint lists the members of each group', () {
       final objects = LevelGenerator.generate(
         environment: Environments.camp,
-        config: GameConfigs.easy,
+        config: _bigLevel,
         seed: 5,
       );
       final hints = HintBuilder.memorizeHints(Environments.camp, objects);
@@ -926,17 +938,11 @@ void main() {
       expect(controller.isPeeking, isFalse);
     });
 
-    test('levels from Hard on have no peeks', () {
-      expect(GameConfigs.hard.peekCount, 0);
-      expect(GameConfigs.medium.peekCount, lessThan(GameConfigs.easy.peekCount));
-      final controller = GameController(
-        environment: Environments.island,
-        config: GameConfigs.hard,
-        seed: 1,
-      )..start();
-      addTearDown(controller.dispose);
-      controller.skipMemorize();
-      expect(controller.canPeek, isFalse);
+    test('every normal level has exactly one peek', () {
+      for (final config in GameConfigs.all) {
+        expect(config.peekCount, 1, reason: config.id);
+      }
+      expect(GameConfigs.tutorial.peekCount, 0);
     });
 
     test('objects cannot be placed while memorizing', () {

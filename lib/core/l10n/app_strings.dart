@@ -349,7 +349,7 @@ class AppStrings {
 
   String get survival => _t('SURVIVAL', 'HAYATTA KALMA');
   String survivalInfo(int startObjects, int rampObjects, int minPercent) => _t(
-        'Starts with $startObjects object and grows to $rampObjects, then '
+        'Starts with $startObjects objects and grows to $rampObjects, then '
             'objects start turning. After that every round adds an object or '
             'turns one more. The run ends when accuracy falls below '
             '$minPercent%.',
