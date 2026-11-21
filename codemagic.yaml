@@ -10,7 +10,7 @@ workflows:
         APP_VERSION: "1.0.1"        # App Store Connect'teki sürüm numarasıyla birebir aynı olmalı
         APP_STORE_APPLE_ID: "BURAYA_APPLE_ID"  # ASC > Uygulama > Genel Bilgiler > Apple ID (sayısal)
       flutter: stable
-      xcode: latest
+      xcode: 27.0   # iOS 27 SDK (Apple gereksinimi)
       cocoapods: default
       ios_signing:
         provisioning_profiles:
