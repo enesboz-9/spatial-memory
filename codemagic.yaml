@@ -6,10 +6,15 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
+      vars:
+        APP_VERSION: "1.0.1"        # App Store Connect'teki sürüm numarasıyla birebir aynı olmalı
+        APP_STORE_APPLE_ID: "BURAYA_APPLE_ID"  # ASC > Uygulama > Genel Bilgiler > Apple ID (sayısal)
       flutter: stable
       xcode: latest
       cocoapods: default
       ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.enesboz.spatialmemory
         provisioning_profiles:
           - spatial_profile
         certificates:
@@ -22,11 +27,18 @@ workflows:
           find . -name "Podfile" -execdir pod install \;
       - name: Set up code signing
         script: xcode-project use-profiles
+      - name: Set build number from App Store Connect
+        script: |
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
+          LATEST=${LATEST:-0}
+          NEW=$((LATEST + 1))
+          echo "Latest TestFlight build: $LATEST -> new build: $NEW"
+          echo "NEW_BUILD_NUMBER=$NEW" >> $CM_ENV
       - name: Build IPA
         script: |
           flutter build ipa --release \
-            --build-name=1.0.1 \
-            --build-number=$BUILD_NUMBER \
+            --build-name=$APP_VERSION \
+            --build-number=$NEW_BUILD_NUMBER \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
